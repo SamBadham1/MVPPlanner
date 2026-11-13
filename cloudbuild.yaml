@@ -1,0 +1,41 @@
+# Builds the container, pushes it to Artifact Registry and deploys it to Cloud Run.
+#
+# Run by a Cloud Build trigger on push, or by hand from the project root:
+#   gcloud builds submit --config cloudbuild.yaml
+#
+# Change the defaults below here, or override them on the trigger.
+substitutions:
+  _REGION: australia-southeast1 # Sydney — Cloud Run + Artifact Registry region
+  _SERVICE: mvp-stack-planner # Cloud Run service name
+  _AR_REPO: mvp-stack-planner # Artifact Registry (Docker) repository — must already exist
+  _IMAGE: ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_AR_REPO}/${_SERVICE}
+
+steps:
+  - id: build
+    name: gcr.io/cloud-builders/docker
+    args: ['build', '-t', '${_IMAGE}:${BUILD_ID}', '-t', '${_IMAGE}:latest', '.']
+
+  - id: push
+    name: gcr.io/cloud-builders/docker
+    args: ['push', '--all-tags', '${_IMAGE}']
+
+  - id: deploy
+    name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
+    entrypoint: gcloud
+    args:
+      - run
+      - deploy
+      - ${_SERVICE}
+      - --image=${_IMAGE}:${BUILD_ID}
+      - --region=${_REGION}
+      - --port=8080
+      - --allow-unauthenticated # public website; remove to require Google sign-in / IAM
+      - --quiet
+
+images:
+  - ${_IMAGE}:${BUILD_ID}
+  - ${_IMAGE}:latest
+
+options:
+  dynamicSubstitutions: true
+  logging: CLOUD_LOGGING_ONLY
