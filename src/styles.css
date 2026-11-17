@@ -420,34 +420,6 @@ summary {
   background: color-mix(in srgb, var(--provider) 14%, transparent);
 }
 
-.chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-  margin-top: 10px;
-}
-
-.chip {
-  font: inherit;
-  font-size: 12px;
-  color: var(--muted);
-  background: transparent;
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  padding: 3px 10px;
-  cursor: pointer;
-}
-
-.chip:hover {
-  color: var(--text);
-}
-
-.chip.active {
-  color: var(--text);
-  border-color: var(--provider, var(--primary));
-  background: color-mix(in srgb, var(--provider, var(--primary)) 20%, transparent);
-}
-
 .react-flow__edge.cross-cloud .react-flow__edge-path {
   stroke: #fbbf24;
   stroke-dasharray: 7 5;
